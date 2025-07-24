@@ -1,36 +1,176 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Nhost Next.js Boilerplate Template
 
-## Getting Started
+A modern, full-stack boilerplate template built with **Next.js** and **Nhost.io**. This template provides authentication, GraphQL API, and real-time features out of the box.
 
-First, run the development server:
+## ✨ Features
+
+- 🔐 **Authentication**: Email/password signup and login with Nhost
+- 🎨 **Modern UI**: Beautiful, responsive design with Tailwind CSS
+- 🔄 **Auth State Management**: Persistent authentication across pages
+- 📊 **GraphQL Integration**: Ready-to-use GraphQL queries and mutations
+- 🌙 **Dark Mode**: Built-in dark/light mode support
+- 📱 **Responsive**: Mobile-first responsive design
+- ⚡ **TypeScript**: Full TypeScript support
+
+## 🚀 Quick Start
+
+### 1. Clone and Install
+
+```bash
+git clone <your-repo-url>
+cd nhost-next-template/nhost-next
+npm install
+```
+
+### 2. Set up Nhost Project
+
+1. Create a new project at [Nhost Dashboard](https://app.nhost.io)
+2. Copy your project's subdomain and region
+3. Create a `.env.local` file:
+
+```bash
+cp .env.example .env.local
+```
+
+4. Update `.env.local` with your Nhost credentials:
+
+```env
+NEXT_PUBLIC_NHOST_SUBDOMAIN=your-subdomain
+NEXT_PUBLIC_NHOST_REGION=your-region
+```
+
+### 3. Set up Database (Optional)
+
+To see the movies example data, run this SQL in your Nhost SQL Editor:
+
+```sql
+CREATE TABLE movies (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  director VARCHAR(255),
+  release_year INTEGER,
+  genre VARCHAR(100),
+  rating FLOAT
+);
+
+INSERT INTO movies (title, director, release_year, genre, rating) VALUES
+  ('Inception', 'Christopher Nolan', 2010, 'Sci-Fi', 8.8),
+  ('The Godfather', 'Francis Ford Coppola', 1972, 'Crime', 9.2),
+  ('Forrest Gump', 'Robert Zemeckis', 1994, 'Drama', 8.8),
+  ('The Matrix', 'Lana Wachowski, Lilly Wachowski', 1999, 'Action', 8.7);
+```
+
+Make sure to enable "Track this" and set proper permissions for the `public` role.
+
+### 4. Run the Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to see your app!
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📁 Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+├── app/
+│   ├── auth/
+│   │   └── page.tsx          # Authentication page (signup/login)
+│   ├── dashboard/
+│   │   └── page.tsx          # Protected dashboard page
+│   ├── components/
+│   │   └── AuthWrapper.tsx   # Auth state management wrapper
+│   ├── layout.tsx            # Root layout with NhostProvider
+│   └── page.tsx              # Landing page
+├── lib/
+│   └── nhost.ts              # Nhost client configuration
+└── ...
+```
 
-## Learn More
+## 🔐 Authentication Flow
 
-To learn more about Next.js, take a look at the following resources:
+1. **Landing Page** (`/`): Shows different content based on auth state
+2. **Auth Page** (`/auth`): Handles both signup and login
+3. **Dashboard** (`/dashboard`): Protected page showing user info and data
+4. **Auth Wrapper**: Automatically redirects users based on authentication status
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🛠️ Key Components
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### AuthWrapper
+Handles automatic redirects and loading states:
+- Redirects unauthenticated users to `/auth`
+- Redirects authenticated users away from `/auth`
+- Shows loading spinner during auth checks
 
-## Deploy on Vercel
+### Nhost Integration
+- **Client**: Configured in `src/lib/nhost.ts`
+- **Provider**: Wraps the entire app in `layout.tsx`
+- **Hooks**: Uses Nhost React hooks for auth and data fetching
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🎨 Styling
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This template uses **Tailwind CSS** with:
+- Responsive design patterns
+- Dark mode support
+- Modern gradient backgrounds
+- Consistent component styling
+- Accessible form elements
+
+## 📊 GraphQL Usage
+
+Example query in the dashboard:
+
+```typescript
+const getMovies = `
+  query {
+    movies {
+      id
+      title
+      director
+      release_year
+      genre
+      rating
+    }
+  }
+`
+
+const { data, error } = await nhost.graphql.request(getMovies)
+```
+
+## 🚀 Deployment
+
+This template can be deployed to any platform that supports Next.js:
+
+### Vercel (Recommended)
+1. Push your code to GitHub
+2. Connect your repository to Vercel
+3. Add your environment variables in Vercel dashboard
+4. Deploy!
+
+### Other Platforms
+- Netlify
+- Railway
+- Render
+- AWS Amplify
+
+## 🔧 Environment Variables
+
+| Variable | Description | Required |
+|----------|-------------|---------|
+| `NEXT_PUBLIC_NHOST_SUBDOMAIN` | Your Nhost project subdomain | Yes |
+| `NEXT_PUBLIC_NHOST_REGION` | Your Nhost project region | Yes |
+
+## 📚 Learn More
+
+- [Nhost Documentation](https://docs.nhost.io)
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).
