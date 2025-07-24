@@ -1,6 +1,6 @@
 'use client'
 
-import { useAuthenticationStatus } from '@nhost/nextjs'
+import { useAuthenticationStatus, useUserData } from '@nhost/nextjs'
 import { useRouter, usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 
@@ -10,21 +10,38 @@ interface AuthWrapperProps {
 
 export function AuthWrapper({ children }: AuthWrapperProps) {
   const { isAuthenticated, isLoading } = useAuthenticationStatus()
+  const user = useUserData()
   const router = useRouter()
   const pathname = usePathname()
 
   useEffect(() => {
     if (!isLoading) {
-      // Redirect to auth if not authenticated and not on auth or landing page
-      if (!isAuthenticated && pathname !== '/auth' && pathname !== '/') {
+      // Redirect to auth if not authenticated and not on public pages
+      if (!isAuthenticated && pathname !== '/auth' && pathname !== '/' && !pathname.startsWith('/auth/')) {
         router.push('/auth')
       }
-      // Redirect to dashboard if authenticated and on auth page
-      if (isAuthenticated && pathname === '/auth') {
-        router.push('/dashboard')
+      
+      // Handle authenticated users
+      if (isAuthenticated && user) {
+        // If on auth page and verified, go to dashboard
+        if (pathname === '/auth' && user.emailVerified) {
+          router.push('/dashboard')
+        }
+        // If on auth page and not verified, go to verify-email
+        else if (pathname === '/auth' && !user.emailVerified) {
+          router.push('/auth/verify-email')
+        }
+        // If trying to access dashboard but not verified, go to verify-email
+        else if (pathname === '/dashboard' && !user.emailVerified) {
+          router.push('/auth/verify-email')
+        }
+        // If on verify-email page but already verified, go to dashboard
+        else if (pathname === '/auth/verify-email' && user.emailVerified) {
+          router.push('/dashboard')
+        }
       }
     }
-  }, [isAuthenticated, isLoading, pathname, router])
+  }, [isAuthenticated, user, isLoading, pathname, router])
 
   // Show loading while checking authentication status
   if (isLoading) {

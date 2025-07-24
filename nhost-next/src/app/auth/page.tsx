@@ -1,24 +1,46 @@
 'use client'
 
-import { useState } from 'react'
-import { useSignUpEmailPassword, useSignInEmailPassword, useAuthenticationStatus } from '@nhost/nextjs'
+import { useState, useEffect } from 'react'
+import { useSignUpEmailPassword, useSignInEmailPassword, useAuthenticationStatus, useUserData } from '@nhost/nextjs'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { nhost } from '../../lib/nhost'
 
 export default function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [displayName, setDisplayName] = useState('')
+  const [verificationEmailSent, setVerificationEmailSent] = useState(false)
   
   const { signUpEmailPassword, isLoading: signUpLoading, error: signUpError } = useSignUpEmailPassword()
   const { signInEmailPassword, isLoading: signInLoading, error: signInError } = useSignInEmailPassword()
-  const { isAuthenticated } = useAuthenticationStatus()
+  const { isAuthenticated, isLoading: authLoading } = useAuthenticationStatus()
+  const user = useUserData()
   const router = useRouter()
 
-  // Redirect if already authenticated
+  // Handle authentication and email verification redirects
+  useEffect(() => {
+    if (!authLoading && isAuthenticated && user) {
+      if (user.emailVerified) {
+        router.push('/dashboard')
+      } else {
+        router.push('/auth/verify-email')
+      }
+    }
+  }, [isAuthenticated, user, authLoading, router])
+
+  // Show loading while checking auth status
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+      </div>
+    )
+  }
+
+  // Don't render if authenticated (will be redirected)
   if (isAuthenticated) {
-    router.push('/dashboard')
     return null
   }
 
@@ -30,12 +52,24 @@ export default function AuthPage() {
         displayName,
       })
       if (result.isSuccess) {
-        // User will be automatically redirected by AuthWrapper
+        // Explicitly send verification email to ensure it's sent
+        try {
+          const { error: emailError } = await nhost.auth.sendVerificationEmail({
+            email: email,
+          })
+          if (!emailError) {
+            setVerificationEmailSent(true)
+          }
+        } catch (error) {
+          console.warn('Failed to send verification email:', error)
+          // Don't block the flow - user can resend from verification page
+        }
+        // User will be redirected to verify-email page by useEffect above
       }
     } else {
       const result = await signInEmailPassword(email, password)
       if (result.isSuccess) {
-        // User will be automatically redirected by AuthWrapper
+        // User will be redirected based on email verification status by useEffect above
       }
     }
   }
@@ -107,6 +141,14 @@ export default function AuthPage() {
                 minLength={6}
               />
             </div>
+
+            {verificationEmailSent && isSignUp && (
+              <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                <p className="text-green-600 dark:text-green-400 text-sm">
+                  ✓ Account created! Verification email sent to {email}
+                </p>
+              </div>
+            )}
 
             {error && (
               <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
