@@ -1,8 +1,9 @@
-# 🚀 Nhost Next.js Authentication Template
+# 🚀 Nhost Next.js + shadcn/ui Template
 
-A **production-ready**, full-stack authentication boilerplate built with **Next.js 15** and **Nhost.io**. This template provides a complete authentication system with email verification, protected routes, and beautiful UI components.
+A **production-ready**, full-stack authentication boilerplate built with **Next.js 15**, **Nhost.io**, and **shadcn/ui**. This template provides a complete authentication system with email verification, protected routes, and a modern design system.
 
 ![Nhost + Next.js](https://img.shields.io/badge/Nhost-Next.js-blue?style=for-the-badge&logo=nextdotjs)
+![shadcn/ui](https://img.shields.io/badge/shadcn%2Fui-000000?style=for-the-badge&logo=shadcnui&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
@@ -15,11 +16,13 @@ A **production-ready**, full-stack authentication boilerplate built with **Next.
 - **Persistent Auth State** across page refreshes
 - **Automatic Redirects** for protected routes
 
-### 🎨 **Modern UI/UX**
-- **Beautiful Landing Page** with feature showcase
+### 🎨 **Modern UI/UX with shadcn/ui**
+- **shadcn/ui Design System** - Professional, accessible components
+- **Clean, Modern Interface** - No gradients, authentic shadcn styling
+- **Lucide React Icons** - Consistent iconography throughout
 - **Responsive Design** that works on all devices
 - **Dark Mode Support** with system preference detection
-- **Loading States** and smooth transitions
+- **Smooth Animations** and loading states
 - **Accessible Components** with proper ARIA labels
 
 ### 🛡️ **Security & Best Practices**
@@ -31,7 +34,10 @@ A **production-ready**, full-stack authentication boilerplate built with **Next.
 
 ### 🔧 **Developer Experience**
 - **Next.js 15** with App Router
+- **shadcn/ui** - Modern component library
 - **Tailwind CSS** for styling
+- **TypeScript** for type safety
+- **Lucide React** for icons
 - **ESLint & Prettier** configured
 - **Hot Reload** development server
 - **Comprehensive Documentation**
@@ -155,46 +161,62 @@ if (authenticated && emailVerified) {
 src/
 ├── app/
 │   ├── auth/
-│   │   ├── page.tsx              # 🔐 Login/Signup page
+│   │   ├── page.tsx              # 🔐 Login/Signup page (shadcn forms)
 │   │   └── verify-email/
-│   │       └── page.tsx          # ✉️ Email verification
+│   │       └── page.tsx          # ✉️ Email verification (shadcn cards)
 │   ├── dashboard/
-│   │   └── page.tsx              # 🏠 Protected dashboard
+│   │   └── page.tsx              # 🏠 Modern dashboard with stats
 │   ├── components/
 │   │   ├── AuthWrapper.tsx       # 🛡️ Route protection
-│   │   └── Providers.tsx         # 🔧 Context providers
+│   │   ├── Providers.tsx         # 🔧 Context providers
+│   │   └── ui/                   # 🎨 shadcn/ui components
+│   │       ├── button.tsx
+│   │       ├── card.tsx
+│   │       ├── input.tsx
+│   │       ├── label.tsx
+│   │       ├── alert.tsx
+│   │       ├── badge.tsx
+│   │       ├── avatar.tsx
+│   │       └── separator.tsx
 │   ├── layout.tsx                # 🎨 Root layout
-│   └── page.tsx                  # 🌟 Landing page
+│   └── page.tsx                  # 🌟 Landing page (clean design)
 ├── lib/
-│   └── nhost.ts                  # ⚙️ Nhost client config
+│   ├── nhost.ts                  # ⚙️ Nhost client config
+│   └── utils.ts                  # 🔧 shadcn/ui utilities
 └── ...
 ```
 
-## 🎨 UI Components
+## 🎨 shadcn/ui Components & Design
 
-### **Landing Page**
-- Hero section with gradient background
-- Feature cards with icons
-- Responsive grid layout
-- Call-to-action buttons
+### **🏠 Landing Page**
+- **Clean Hero Section** - No gradients, modern typography
+- **Feature Cards** - shadcn Card components with icons
+- **Tech Stack Badges** - shadcn Badge components
+- **CTA Buttons** - shadcn Button with variants
+- **Responsive Grid Layout** - Mobile-first design
 
-### **Authentication Forms**
-- Toggle between Sign Up/Sign In
-- Form validation and error handling
-- Loading states with spinners
-- Success/error message displays
+### **🔐 Authentication Forms**
+- **shadcn Card Layout** - Professional form container
+- **shadcn Input & Label** - Accessible form controls
+- **Toggle Sign Up/Sign In** - Smooth state management
+- **shadcn Alert Components** - Error/success messages
+- **Loading States** - Lucide Loader2 icons
+- **Black Background** - Modern, high-contrast design
 
-### **Email Verification**
-- Clear verification instructions
-- Resend email functionality
-- Success/error feedback
-- Sign out option
+### **✉️ Email Verification**
+- **shadcn Card Structure** - Clean, organized layout
+- **Lucide Icons** - Mail, ArrowLeft, Loader2
+- **shadcn Alert System** - Status feedback
+- **shadcn Buttons** - Consistent interaction patterns
+- **Professional Typography** - Clear hierarchy
 
-### **Dashboard**
-- User information cards
-- GraphQL data display
-- Responsive table layout
-- Navigation and sign out
+### **📊 Dashboard**
+- **Stats Overview Cards** - Key metrics at a glance
+- **User Profile Section** - Organized with Lucide icons
+- **Modern Movie Cards** - Replaced table with card layout
+- **Star Ratings** - Visual rating system
+- **Status Badges** - Color-coded verification status
+- **Avatar Component** - User profile representation
 
 ## 🔧 Configuration
 
