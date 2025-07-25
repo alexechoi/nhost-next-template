@@ -2,92 +2,124 @@
 
 import Link from 'next/link'
 import { useAuthenticationStatus } from '@nhost/nextjs'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 
 export default function Home() {
   const { isAuthenticated, isLoading } = useAuthenticationStatus()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-16">
-        <div className="text-center">
-          <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
-            Welcome to{' '}
-            <span className="text-blue-600 dark:text-blue-400">Nhost</span>
-          </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-            A modern, full-stack boilerplate template built with Next.js and Nhost.io.
-            Get started with authentication, GraphQL, and real-time features out of the box.
-          </p>
+        <div className="text-center space-y-8">
+          <div className="space-y-4">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
+              Welcome to{' '}
+              <span className="text-primary">Nhost</span>
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-7">
+              A modern, full-stack boilerplate template built with Next.js and Nhost.io.
+              Get started with authentication, GraphQL, and real-time features out of the box.
+            </p>
+          </div>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             {!isLoading && (
               isAuthenticated ? (
-                <Link
-                  href="/dashboard"
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl"
-                >
-                  Go to Dashboard
-                </Link>
+                <Button asChild size="lg">
+                  <Link href="/dashboard">
+                    Go to Dashboard
+                  </Link>
+                </Button>
               ) : (
                 <>
-                  <Link
-                    href="/auth"
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl"
-                  >
-                    Get Started
-                  </Link>
-                  <Link
-                    href="https://docs.nhost.io"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-200"
-                  >
-                    Documentation
-                  </Link>
+                  <Button asChild size="lg">
+                    <Link href="/auth">
+                      Get Started
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" size="lg">
+                    <Link
+                      href="https://docs.nhost.io"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Documentation
+                    </Link>
+                  </Button>
                 </>
               )
             )}
           </div>
+        </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
-              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mb-4 mx-auto">
-                <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <title>Authentication Icon</title>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Authentication</h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                Built-in user authentication with email/password, social logins, and JWT tokens.
-              </p>
+        {/* Features Section */}
+        <div className="mt-24 space-y-16">
+          <div className="text-center space-y-4">
+            <h2 className="text-3xl font-bold tracking-tight">
+              Built with Modern Technologies
+            </h2>
+            <div className="flex flex-wrap justify-center gap-2 max-w-2xl mx-auto">
+              {[
+                'Next.js 15',
+                'React 19',
+                'TypeScript',
+                'Tailwind CSS',
+                'Nhost.io',
+                'GraphQL',
+                'PostgreSQL'
+              ].map((tech) => (
+                <Badge key={tech} variant="secondary">
+                  {tech}
+                </Badge>
+              ))}
             </div>
+          </div>
 
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
-              <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center mb-4 mx-auto">
-                <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <title>Database Icon</title>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">GraphQL API</h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                Auto-generated GraphQL API with real-time subscriptions and role-based permissions.
-              </p>
-            </div>
-
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
-              <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center mb-4 mx-auto">
-                <svg className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <title>Real-time Icon</title>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Real-time</h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                Real-time data synchronization with WebSocket subscriptions and live updates.
-              </p>
-            </div>
+          {/* Features Grid */}
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <Card className="text-center">
+              <CardHeader className="pb-4">
+                <div className="w-12 h-12 mx-auto mb-4 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <div className="text-2xl">🔐</div>
+                </div>
+                <CardTitle className="text-xl">Authentication</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-base">
+                  Built-in user authentication with email/password, social logins, and JWT tokens.
+                </CardDescription>
+              </CardContent>
+            </Card>
+            
+            <Card className="text-center">
+              <CardHeader className="pb-4">
+                <div className="w-12 h-12 mx-auto mb-4 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <div className="text-2xl">🚀</div>
+                </div>
+                <CardTitle className="text-xl">GraphQL API</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-base">
+                  Auto-generated GraphQL API with real-time subscriptions and powerful queries.
+                </CardDescription>
+              </CardContent>
+            </Card>
+            
+            <Card className="text-center">
+              <CardHeader className="pb-4">
+                <div className="w-12 h-12 mx-auto mb-4 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <div className="text-2xl">💾</div>
+                </div>
+                <CardTitle className="text-xl">Database</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-base">
+                  PostgreSQL database with automatic migrations and admin interface.
+                </CardDescription>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
