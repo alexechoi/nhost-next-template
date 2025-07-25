@@ -68,6 +68,39 @@ export default function AuthPage() {
 		return null;
 	}
 
+	// Helper function to record login attempt
+	const recordLoginAttempt = async (userId: string | null, success: boolean) => {
+		if (!userId) return; // Can't record without user ID
+		
+		try {
+			// Get client info
+			const userAgent = navigator.userAgent;
+			// Note: IP address will be null since we can't get it client-side
+			// In production, you might want to get this from a server endpoint
+			
+			const mutation = `
+				mutation InsertLoginAttempt($user_id: uuid!, $success: Boolean!, $user_agent: String) {
+					insert_login_attempts_one(object: {
+						user_id: $user_id,
+						success: $success,
+						user_agent: $user_agent
+					}) {
+						id
+					}
+				}
+			`;
+			
+			await nhost.graphql.request(mutation, {
+				user_id: userId,
+				success: success,
+				user_agent: userAgent
+			});
+		} catch (error) {
+			console.warn('Failed to record login attempt:', error);
+			// Don't block the auth flow if logging fails
+		}
+	};
+
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
@@ -91,9 +124,20 @@ export default function AuthPage() {
 				// User will be redirected to verify-email page by useEffect above
 			}
 		} else {
+			// Sign in attempt
 			const result = await signInEmailPassword(email, password);
-			if (result.isSuccess) {
+			
+			// Record login attempt (both success and failure)
+			if (result.isSuccess && result.user) {
+				// Record successful login
+				await recordLoginAttempt(result.user.id, true);
 				// User will be redirected based on email verification status by useEffect above
+			} else if (result.isError) {
+				// For failed attempts, we need to try to get the user ID
+				// This is tricky since failed login doesn't return user info
+				// We could potentially look up user by email, but that might be a security risk
+				// For now, we'll only log successful attempts
+				console.log('Login failed:', result.error?.message);
 			}
 		}
 	};

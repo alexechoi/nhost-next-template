@@ -29,30 +29,29 @@ import {
 	Activity,
 	TrendingUp,
 	Users,
-	Star,
 	Home,
 	LogOut,
 	Loader2,
 } from "lucide-react";
 
-interface Movie {
+interface LoginAttempt {
 	id: string;
-	title: string;
-	director: string;
-	release_year: number;
-	genre: string;
-	rating: number;
+	user_id: string;
+	success: boolean;
+	timestamp: string;
+	ip_address?: string;
+	user_agent?: string;
 }
 
-const getMovies = `
-  query {
-    movies {
+const getLoginAttempts = `
+  query GetLoginAttempts($user_id: uuid!) {
+    login_attempts(where: {user_id: {_eq: $user_id}}, order_by: {timestamp: desc}, limit: 10) {
       id
-      title
-      director
-      release_year
-      genre
-      rating
+      user_id
+      success
+      timestamp
+      ip_address
+      user_agent
     }
   }
 `;
@@ -62,9 +61,9 @@ export default function Dashboard() {
 	const { signOut } = useSignOut();
 	const user = useUserData();
 	const router = useRouter();
-	const [movies, setMovies] = useState<Movie[]>([]);
-	const [moviesLoading, setMoviesLoading] = useState(true);
-	const [moviesError, setMoviesError] = useState<string | null>(null);
+	const [loginAttempts, setLoginAttempts] = useState<LoginAttempt[]>([]);
+	const [attemptsLoading, setAttemptsLoading] = useState(true);
+	const [attemptsError, setAttemptsError] = useState<string | null>(null);
 
 	// Redirect if not authenticated
 	useEffect(() => {
@@ -73,31 +72,37 @@ export default function Dashboard() {
 		}
 	}, [isAuthenticated, isLoading, router]);
 
-	// Fetch movies when component mounts
+	// Fetch login attempts when component mounts
 	useEffect(() => {
-		async function fetchMovies() {
+		async function fetchLoginAttempts() {
+			if (!user?.id) return;
+
 			try {
-				setMoviesLoading(true);
-				const { data, error } = await nhost.graphql.request(getMovies);
+				setAttemptsLoading(true);
+				const { data, error } = await nhost.graphql.request(getLoginAttempts, {
+					user_id: user.id,
+				});
 
 				if (error) {
-					setMoviesError(
-						"Failed to fetch movies. Make sure your database is set up correctly.",
+					console.error("GraphQL Error:", error);
+					setAttemptsError(
+						"Failed to fetch login attempts. Make sure GraphQL permissions are set up correctly.",
 					);
 				} else {
-					setMovies(data?.movies || []);
+					setLoginAttempts(data?.login_attempts || []);
 				}
-			} catch {
-				setMoviesError("Failed to connect to the database.");
+			} catch (err) {
+				console.error("Fetch Error:", err);
+				setAttemptsError("Failed to connect to the database.");
 			} finally {
-				setMoviesLoading(false);
+				setAttemptsLoading(false);
 			}
 		}
 
-		if (isAuthenticated) {
-			fetchMovies();
+		if (isAuthenticated && user?.id) {
+			fetchLoginAttempts();
 		}
-	}, [isAuthenticated]);
+	}, [isAuthenticated, user?.id]);
 
 	const handleSignOut = async () => {
 		await signOut();
@@ -181,9 +186,9 @@ export default function Dashboard() {
 							<div className="flex items-center justify-between">
 								<div>
 									<p className="text-sm font-medium text-muted-foreground">
-										Movies
+										Login Attempts
 									</p>
-									<p className="text-2xl font-bold">{movies.length}</p>
+									<p className="text-2xl font-bold">{loginAttempts.length}</p>
 								</div>
 								<Database className="h-8 w-8 text-blue-600" />
 							</div>
@@ -198,15 +203,15 @@ export default function Dashboard() {
 										API Status
 									</p>
 									<p className="text-2xl font-bold">
-										{moviesError
+										{attemptsError
 											? "Error"
-											: moviesLoading
+											: attemptsLoading
 												? "Loading"
 												: "Active"}
 									</p>
 								</div>
 								<Activity
-									className={`h-8 w-8 ${moviesError ? "text-red-600" : moviesLoading ? "text-yellow-600" : "text-green-600"}`}
+									className={`h-8 w-8 ${attemptsError ? "text-red-600" : attemptsLoading ? "text-yellow-600" : "text-green-600"}`}
 								/>
 							</div>
 						</CardContent>
@@ -315,66 +320,78 @@ export default function Dashboard() {
 						<div className="flex items-center justify-between">
 							<div>
 								<CardTitle className="flex items-center gap-2">
-									<Database className="h-5 w-5" />
-									Movies Database
+									<Activity className="h-5 w-5" />
+									Login History
 								</CardTitle>
 								<CardDescription>
-									Sample data from your Nhost GraphQL API
+									Your recent login attempts and activity
 								</CardDescription>
 							</div>
-							{movies.length > 0 && (
+							{loginAttempts.length > 0 && (
 								<Badge variant="outline" className="flex items-center gap-1">
 									<TrendingUp className="h-3 w-3" />
-									{movies.length} movies
+									{loginAttempts.length} attempts
 								</Badge>
 							)}
 						</div>
 					</CardHeader>
 					<CardContent>
-						{moviesLoading ? (
+						{attemptsLoading ? (
 							<div className="flex items-center justify-center py-12">
 								<div className="text-center space-y-3">
 									<Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
 									<p className="text-muted-foreground">
-										Loading movies from GraphQL API...
+										Loading login attempts from GraphQL API...
 									</p>
 								</div>
 							</div>
-						) : moviesError ? (
+						) : attemptsError ? (
 							<Alert variant="destructive">
-								<AlertDescription>{moviesError}</AlertDescription>
+								<AlertDescription>{attemptsError}</AlertDescription>
 								<p className="text-sm mt-2">
-									Check your .env file and make sure your Nhost project is
-									configured correctly.
+									Make sure GraphQL permissions are set up for the
+									login_attempts table.
 								</p>
 							</Alert>
-						) : movies.length > 0 ? (
+						) : loginAttempts.length > 0 ? (
 							<div className="space-y-4">
 								<div className="grid gap-4">
-									{movies.map((movie) => (
+									{loginAttempts.map((attempt) => (
 										<Card
-											key={movie.id}
+											key={attempt.id}
 											className="transition-colors hover:bg-muted/50"
 										>
 											<CardContent className="p-4">
 												<div className="flex items-center justify-between">
 													<div className="space-y-1">
-														<h3 className="font-semibold text-lg">
-															{movie.title}
-														</h3>
-														<p className="text-sm text-muted-foreground">
-															Directed by {movie.director} •{" "}
-															{movie.release_year}
-														</p>
-													</div>
-													<div className="flex items-center gap-3">
-														<Badge variant="outline">{movie.genre}</Badge>
-														<div className="flex items-center gap-1">
-															<Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+														<div className="flex items-center gap-2">
+															<Badge
+																variant={
+																	attempt.success ? "default" : "destructive"
+																}
+																className="text-xs"
+															>
+																{attempt.success ? "Success" : "Failed"}
+															</Badge>
 															<span className="font-medium">
-																{movie.rating}
+																{new Date(attempt.timestamp).toLocaleString()}
 															</span>
 														</div>
+														{attempt.user_agent && (
+															<p className="text-sm text-muted-foreground truncate max-w-md">
+																{attempt.user_agent}
+															</p>
+														)}
+													</div>
+													<div className="flex items-center gap-2">
+														{attempt.ip_address && (
+															<Badge variant="outline" className="text-xs">
+																{attempt.ip_address}
+															</Badge>
+														)}
+														<Activity
+															className={`h-4 w-4 ${attempt.success ? "text-green-600" : "text-red-600"}`}
+														/>
 													</div>
 												</div>
 											</CardContent>
@@ -385,12 +402,11 @@ export default function Dashboard() {
 						) : (
 							<div className="text-center py-12">
 								<div className="space-y-3">
-									<Database className="h-12 w-12 mx-auto text-muted-foreground" />
+									<Activity className="h-12 w-12 mx-auto text-muted-foreground" />
 									<div>
-										<h3 className="font-semibold">No movies found</h3>
+										<h3 className="font-semibold">No login attempts found</h3>
 										<p className="text-sm text-muted-foreground">
-											Set up the movies table in your Nhost database to see
-											sample data here.
+											Your login attempts will appear here once you sign in.
 										</p>
 									</div>
 								</div>
